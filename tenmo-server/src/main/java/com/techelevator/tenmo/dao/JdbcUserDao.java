@@ -93,6 +93,15 @@ public class JdbcUserDao implements UserDao {
         return newUser;
     }
 
+    @Override
+    public Double getAccountBalance(int userId) {
+        Double balance = null;
+
+        String sql = "Select balance from account Where user_id = ?;";
+            balance = jdbcTemplate.queryForObject(sql, Double.class, userId);
+            return balance;
+    }
+
     private User mapRowToUser(SqlRowSet rs) {
         User user = new User();
         user.setId(rs.getInt("user_id"));
