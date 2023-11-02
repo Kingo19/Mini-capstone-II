@@ -13,12 +13,11 @@ public interface TransferDao {
 
     NewTransfer addToTransferTable(NewTransfer newTransfer);
 
-    public interface TransferDAO {
-        void deductFrom(int accountFrom, BigDecimal amount);
 
-        void addMoneyTo(int accountTo, BigDecimal amount);
+    List<Transfer> showTransfers(int userId);
 
-        NewTransfer addToTransferTable(NewTransfer newTransfer);
+    Transfer getTransferById(int transferId, int userId);
 
-    }
 }
+
+

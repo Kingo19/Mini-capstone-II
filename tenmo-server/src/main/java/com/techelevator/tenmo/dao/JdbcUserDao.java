@@ -1,6 +1,7 @@
 package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.exception.DaoException;
+import com.techelevator.tenmo.model.OtherUser;
 import com.techelevator.tenmo.model.RegisterUserDto;
 import com.techelevator.tenmo.model.User;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -100,6 +101,26 @@ public class JdbcUserDao implements UserDao {
         String sql = "Select balance from account Where user_id = ?;";
             balance = jdbcTemplate.queryForObject(sql, Double.class, userId);
             return balance;
+    }
+
+    @Override
+    public List<OtherUser> findAllButLoggedIn(String username){
+        List<OtherUser> users = new ArrayList<>();
+        String sql = "SELECT user_id, username FROM tenmo_user WHERE username <> ?";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, username);
+        while(results.next()) {
+
+            OtherUser otherUser = new OtherUser();
+
+            int userId = results.getInt("user_id");
+            String uName = results.getString("username");
+
+            otherUser.setUsername(uName);
+            otherUser.setId(userId);
+
+            users.add(otherUser);
+        }
+        return users;
     }
 
     private User mapRowToUser(SqlRowSet rs) {

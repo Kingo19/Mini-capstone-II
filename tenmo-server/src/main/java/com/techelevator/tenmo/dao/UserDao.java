@@ -1,5 +1,6 @@
 package com.techelevator.tenmo.dao;
 
+import com.techelevator.tenmo.model.OtherUser;
 import com.techelevator.tenmo.model.RegisterUserDto;
 import com.techelevator.tenmo.model.User;
 
@@ -16,4 +17,15 @@ public interface UserDao {
     User createUser(RegisterUserDto user);
 
     Double getAccountBalance(int userId);
+
+    List<OtherUser> findAllButLoggedIn(String username);
 }
+
+
+
+
+
+
+
+
+
