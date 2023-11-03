@@ -3,10 +3,22 @@ package com.techelevator.tenmo.services;
 
 import com.techelevator.tenmo.model.UserCredentials;
 
+import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.util.Scanner;
 
 public class ConsoleService {
+
+    private PrintWriter out;
+    private Scanner in;
+
+    public ConsoleService(PrintWriter out, Scanner in) {
+        this.out = out;
+        this.in = in;
+    }
+
+    public ConsoleService() {
+    }
 
     private final Scanner scanner = new Scanner(System.in);
 
@@ -87,5 +99,24 @@ public class ConsoleService {
     public void printErrorMessage() {
         System.out.println("An error occurred. Check the log for details.");
     }
+    public Integer getUserInputInteger(String prompt) {
+        Integer result = null;
+        do {
+            out.print(prompt+": ");
+            out.flush();
+            String userInput = in.nextLine();
+            try {
+                result = Integer.parseInt(userInput);
+            } catch(NumberFormatException e) {
+                out.println(System.lineSeparator() + "*** " + userInput + " is not valid ***" + System.lineSeparator());
+            }
+        } while(result == null);
+        return result;
+    }
 
+    public String getUserInput(String prompt) {
+        out.print(prompt+": ");
+        out.flush();
+        return in.nextLine();
+    }
 }

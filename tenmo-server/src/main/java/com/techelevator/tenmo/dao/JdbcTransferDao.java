@@ -21,6 +21,11 @@ public class JdbcTransferDao implements TransferDao {
 
     }
 
+    private BigDecimal getCurrentBalance(int userId) {
+        String sqlGetBalance = "SELECT balance FROM account WHERE user_id = ?";
+        return jdbcTemplate.queryForObject(sqlGetBalance, BigDecimal.class, userId);
+    }
+
     @Override
     public void deductFrom(int userIdFrom, BigDecimal amount) {  //Updates the account that the transfer is coming from (user inputting the transfer)
         AccountModel transferFromAccount = new AccountModel(); //created a from account object
@@ -148,6 +153,27 @@ public class JdbcTransferDao implements TransferDao {
             }
         } return null;
     }
+
+
+    @Override
+    public void requestMoney(int userIdFrom, int userIdTo, BigDecimal amount) {
+        // Retrieve the current balance of the user initiating the request
+        BigDecimal currentBalance = getCurrentBalance(userIdFrom);
+
+        // Check if the current balance is sufficient to cover the requested amount
+        if (currentBalance.compareTo(amount) < 0) {
+
+            System.out.println("Insufficient balance to request money");
+        }
+
+        // Deduct the requested amount from the user's account
+        deductFrom(userIdFrom, amount);
+
+        // Insert a record into the transfer table to represent the money request
+        String sqlPostToTransfer = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) VALUES (?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sqlPostToTransfer, 1, 1, convertedAccountID(userIdFrom), convertedAccountID(userIdTo), amount);
+    }
+
 
     private Transfer mapRowToTransfer(SqlRowSet rs) {
         Transfer transfer = new Transfer();

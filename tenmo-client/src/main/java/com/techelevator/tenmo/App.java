@@ -1,10 +1,17 @@
 package com.techelevator.tenmo;
 
-import com.techelevator.tenmo.model.AuthenticatedUser;
-import com.techelevator.tenmo.model.UserCredentials;
+import com.techelevator.tenmo.model.*;
+import com.techelevator.tenmo.services.AccountService;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
 import com.techelevator.tenmo.services.UserService;
+
+import java.io.PrintWriter;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
 
 public class App {
 
@@ -13,13 +20,19 @@ public class App {
     private final ConsoleService consoleService = new ConsoleService();
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
     private final UserService userService = new UserService(API_BASE_URL);
+    private AccountService accountService = new AccountService();
     private AuthenticatedUser currentUser;
+    PrintWriter out = new PrintWriter(System.out);
+    Scanner in = new Scanner(System.in);
+    ConsoleService console = new ConsoleService(out, in);
 
 
     public static void main(String[] args) {
         App app = new App();
         app.run();
+
     }
+
 
     private void run() {
         consoleService.printGreeting();
@@ -28,6 +41,7 @@ public class App {
             mainMenu();
         }
     }
+
     private void loginMenu() {
         int menuSelection = -1;
         while (menuSelection != 0 && currentUser == null) {
@@ -86,33 +100,60 @@ public class App {
         }
     }
 
-	private void viewCurrentBalance() {
-		if(currentUser != null){
-            int userId = currentUser.getUser().getId();
-            Double balance = userService.getAccountBalance(userId);
-            System.out.println("Your account balance is: " + balance);
+    private void viewCurrentBalance() {
+        BigDecimal balance = accountService.getBalance(currentUser.getToken());
+        System.out.println("Your current account balance is: $" + balance + "\n");
+
+    }
+
+    private void viewTransferHistory() {
+        System.out.println("-------------------------------------------\n" + "TRANSFER HISTORY:\n" + "\n" +
+                "TRANSFER ID      FROM/TO        AMOUNT\n-------------------------------------------");
+        Transfer[] transferList = accountService.getHistory(currentUser.getToken(), currentUser.getUser().getId());
+        for (Transfer transfer : transferList) {
+
+            if (transfer.isWasSentToUs()) {
+                System.out.println(transfer.getTransferId() + "          FROM: " + transfer.getOtherUser() +
+                        "       $" + transfer.getAmount() + "\n");
+            } else {
+                System.out.println(transfer.getTransferId() + "          TO:   " + transfer.getOtherUser() +
+                        "       $" + transfer.getAmount() + "\n");
+            }
         }
 
-		
-	}
+        int transferId = console.getUserInputInteger("Enter the transfer ID for the transfer you want to view in detail");
 
-	private void viewTransferHistory() {
+        for (Transfer requestedTransfer : transferList) {
+            if (requestedTransfer.getTransferId() == transferId && requestedTransfer.isWasSentToUs()) {
+                Transfer transferById = accountService.historyByTransferId(currentUser.getToken(), currentUser.getUser().getId(), transferId);
+                System.out.println("\nID: " + transferById.getTransferId() + "\nFrom User: " + transferById.getOtherUser() + "\nTo User: " + currentUser.getUser().getUsername() +
+                        "\nTransfer status: Approved" + "\nFor the Amount of: $" + transferById.getAmount());
+                break;
 
-	}
+            } else if (requestedTransfer.getTransferId() == transferId && !requestedTransfer.isWasSentToUs()) {
+                Transfer transferById = accountService.historyByTransferId(currentUser.getToken(), currentUser.getUser().getId(), transferId);
+                System.out.println("\nID: " + transferById.getTransferId() + "\nFrom User: " + currentUser.getUser().getUsername() + "\nTo User: " + transferById.getOtherUser() +
+                        "\nTransfer Status: Approved" + "\nFor the Amount of: $" + transferById.getAmount());
+                break;
+            }
+        }
 
-	private void viewPendingRequests() {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
-	private void sendBucks() {
-		// TODO Auto-generated method stub
-		
-	}
 
-	private void requestBucks() {
-		// TODO Auto-generated method stub
-		
-	}
+    private void viewPendingRequests() {
+        // TODO Auto-generated method stub
+
+    }
+
+    private void sendBucks() {
+        // TODO Auto-generated method stub
+
+    }
+
+    private void requestBucks() {
+        // TODO Auto-generated method stub
+
+    }
 
 }

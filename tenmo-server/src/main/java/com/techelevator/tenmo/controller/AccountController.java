@@ -7,6 +7,8 @@ import com.techelevator.tenmo.model.NewTransfer;
 import com.techelevator.tenmo.model.OtherUser;
 import com.techelevator.tenmo.model.Transfer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,5 +67,12 @@ public class AccountController {
         Transfer requestedByTransferId = transferDAO.getTransferById(id, transferId);
         return requestedByTransferId;
     }
+
+    @RequestMapping(path = "/request-money", method = RequestMethod.POST)
+    public ResponseEntity<NewTransfer> requestMoney(@RequestBody NewTransfer newTransfer) {
+        transferDAO.requestMoney(newTransfer.getFromUserId(), newTransfer.getToUserId(), newTransfer.getAmount());
+        return new ResponseEntity<>(newTransfer, HttpStatus.OK);
+    }
+
 
 }

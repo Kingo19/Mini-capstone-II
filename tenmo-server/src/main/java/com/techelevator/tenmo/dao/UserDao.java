@@ -19,6 +19,7 @@ public interface UserDao {
     Double getAccountBalance(int userId);
 
     List<OtherUser> findAllButLoggedIn(String username);
+
 }
 
 
