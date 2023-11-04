@@ -114,7 +114,7 @@ public class App {
             if (transfer.isWasSentToUs()){
                 consoleService.printViewTransferHistory2(transfer.getTransferId(), transfer.getOtherUser(), transfer.getAmount());
             } else {
-                consoleService.printViewTransferHistory2(transfer.getTransferId(), transfer.getOtherUser(), transfer.getAmount());
+                consoleService.printViewTransferHistory2a(transfer.getTransferId(), transfer.getOtherUser(), transfer.getAmount());
             }
         }
 

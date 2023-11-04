@@ -18,7 +18,6 @@ public interface TransferDao {
 
     Transfer getTransferById(int transferId, int userId);
 
-    void requestMoney(int userIdFrom, int userIdTo, BigDecimal amount);
 
 }
 

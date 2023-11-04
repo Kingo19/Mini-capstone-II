@@ -17,13 +17,6 @@ public class JdbcTransferDao implements TransferDao {
 
     public JdbcTransferDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-
-
-    }
-
-    private BigDecimal getCurrentBalance(int userId) {
-        String sqlGetBalance = "SELECT balance FROM account WHERE user_id = ?";
-        return jdbcTemplate.queryForObject(sqlGetBalance, BigDecimal.class, userId);
     }
 
     @Override
@@ -73,40 +66,6 @@ public class JdbcTransferDao implements TransferDao {
 
     }
 
-    public int convertedAccountID(int userId) {
-        int accountIdConverted = 0;
-        String sqlConvertUserIdToAccountId = "SELECT account_id FROM account WHERE user_id = ?";
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sqlConvertUserIdToAccountId, userId);
-        while (results.next()) {
-            accountIdConverted = results.getInt("account_id");
-        }
-        return accountIdConverted;
-
-    }
-
-    public int convertedUserID(int accountId) {
-        int convertedUserId = 0;
-        String sqlConvertAccountIdToUserId = "SELECT user_id FROM account WHERE account_id = ?";
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sqlConvertAccountIdToUserId, accountId);
-        while (results.next()) {
-            convertedUserId = results.getInt("user_id");
-        }
-        return convertedUserId;
-
-    }
-
-    public String findUsernameById(int userId) {
-        String username = "";
-        String sql = "SELECT username FROM tenmo_user WHERE user_id = ?";
-        username = jdbcTemplate.queryForObject(sql, String.class, userId);
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, userId);
-        while (results.next()) {
-            username = results.getString("username");
-        }
-        return username;
-
-    }
-
     public List<Transfer> showTransfers(int userId) {
         List<Transfer> listOfTransfers = new ArrayList<>();
 
@@ -133,7 +92,6 @@ public class JdbcTransferDao implements TransferDao {
 
     }
 
-
     public Transfer getTransferById(int currentUser, int transferId) {
         String sqlShowTransferById = "SELECT * FROM transfer WHERE transfer_id = ?";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sqlShowTransferById, transferId);
@@ -154,26 +112,38 @@ public class JdbcTransferDao implements TransferDao {
         } return null;
     }
 
-
-    @Override
-    public void requestMoney(int userIdFrom, int userIdTo, BigDecimal amount) {
-        // Retrieve the current balance of the user initiating the request
-        BigDecimal currentBalance = getCurrentBalance(userIdFrom);
-
-        // Check if the current balance is sufficient to cover the requested amount
-        if (currentBalance.compareTo(amount) < 0) {
-
-            System.out.println("Insufficient balance to request money");
+    public int convertedAccountID(int userId) {
+        int accountIdConverted = 0;
+        String sqlConvertUserIdToAccountId = "SELECT account_id FROM account WHERE user_id = ?";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sqlConvertUserIdToAccountId, userId);
+        while (results.next()) {
+            accountIdConverted = results.getInt("account_id");
         }
+        return accountIdConverted;
 
-        // Deduct the requested amount from the user's account
-        deductFrom(userIdFrom, amount);
+    }
+    public int convertedUserID(int accountId) {
+        int convertedUserId = 0;
+        String sqlConvertAccountIdToUserId = "SELECT user_id FROM account WHERE account_id = ?";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sqlConvertAccountIdToUserId, accountId);
+        while (results.next()) {
+            convertedUserId = results.getInt("user_id");
+        }
+        return convertedUserId;
 
-        // Insert a record into the transfer table to represent the money request
-        String sqlPostToTransfer = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) VALUES (?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sqlPostToTransfer, 1, 1, convertedAccountID(userIdFrom), convertedAccountID(userIdTo), amount);
     }
 
+    public String findUsernameById(int userId) {
+        String username = "";
+        String sql = "SELECT username FROM tenmo_user WHERE user_id = ?";
+        username = jdbcTemplate.queryForObject(sql, String.class, userId);
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, userId);
+        while (results.next()) {
+            username = results.getString("username");
+        }
+        return username;
+
+    }
 
     private Transfer mapRowToTransfer(SqlRowSet rs) {
         Transfer transfer = new Transfer();
@@ -183,7 +153,6 @@ public class JdbcTransferDao implements TransferDao {
         transfer.setAccountFrom(rs.getInt("account_from"));
         transfer.setAccountTo(rs.getInt("account_to"));
         transfer.setAmount(rs.getBigDecimal("amount"));
-
 
         return transfer;
     }

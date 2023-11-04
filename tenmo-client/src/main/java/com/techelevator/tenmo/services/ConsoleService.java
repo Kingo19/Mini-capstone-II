@@ -122,13 +122,19 @@ public class ConsoleService {
 
     }
     public void printViewTransferHistory2(int id, String user, BigDecimal amount) {
-        System.out.println(id + "          FROM: " + user +
+        System.out.println(id + "          From: " + user +
+                "       $" + amount + "\n");
+    }
+
+    public void printViewTransferHistory2a(int id, String user, BigDecimal amount) {
+        System.out.println(id + "          To: " + user +
                 "       $" + amount + "\n");
     }
     public void printViewTransferHistory3(int id, String user1, String user2, BigDecimal amount) {
         System.out.println("\nID: " + id + "\nFrom User: " + user1 + "\nTo User: " + user2 +
                 "\nTransfer Status: Approved" + "\nFor the Amount of: $" + amount);
     }
+
     public void printSendBuk() {
         System.out.println("-------------------------------------------\n" + "Users\n" + "ID    Name\n" + "-------------------------------------------\n");
     }

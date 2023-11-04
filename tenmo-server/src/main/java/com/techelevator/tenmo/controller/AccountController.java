@@ -68,11 +68,6 @@ public class AccountController {
         return requestedByTransferId;
     }
 
-    @RequestMapping(path = "/request-money", method = RequestMethod.POST)
-    public ResponseEntity<NewTransfer> requestMoney(@RequestBody NewTransfer newTransfer) {
-        transferDAO.requestMoney(newTransfer.getFromUserId(), newTransfer.getToUserId(), newTransfer.getAmount());
-        return new ResponseEntity<>(newTransfer, HttpStatus.OK);
-    }
 
 
 }
