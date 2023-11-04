@@ -102,22 +102,19 @@ public class App {
 
     private void viewCurrentBalance() {
         BigDecimal balance = accountService.getBalance(currentUser.getToken());
-        System.out.println("Your current account balance is: $" + balance + "\n");
+        String showCurrentBalance = consoleService.printCurrentBalance() + " " + balance;
+        System.out.println(showCurrentBalance);
 
     }
 
     private void viewTransferHistory() {
-        System.out.println("-------------------------------------------\n" + "TRANSFER HISTORY:\n" + "\n" +
-                "TRANSFER ID      FROM/TO        AMOUNT\n-------------------------------------------");
+        consoleService.printViewTransferHistory1();
         Transfer[] transferList = accountService.getHistory(currentUser.getToken(), currentUser.getUser().getId());
         for (Transfer transfer : transferList) {
-
-            if (transfer.isWasSentToUs()) {
-                System.out.println(transfer.getTransferId() + "          FROM: " + transfer.getOtherUser() +
-                        "       $" + transfer.getAmount() + "\n");
+            if (transfer.isWasSentToUs()){
+                consoleService.printViewTransferHistory2(transfer.getTransferId(), transfer.getOtherUser(), transfer.getAmount());
             } else {
-                System.out.println(transfer.getTransferId() + "          TO:   " + transfer.getOtherUser() +
-                        "       $" + transfer.getAmount() + "\n");
+                consoleService.printViewTransferHistory2(transfer.getTransferId(), transfer.getOtherUser(), transfer.getAmount());
             }
         }
 
@@ -126,14 +123,12 @@ public class App {
         for (Transfer requestedTransfer : transferList) {
             if (requestedTransfer.getTransferId() == transferId && requestedTransfer.isWasSentToUs()) {
                 Transfer transferById = accountService.historyByTransferId(currentUser.getToken(), currentUser.getUser().getId(), transferId);
-                System.out.println("\nID: " + transferById.getTransferId() + "\nFrom User: " + transferById.getOtherUser() + "\nTo User: " + currentUser.getUser().getUsername() +
-                        "\nTransfer status: Approved" + "\nFor the Amount of: $" + transferById.getAmount());
+                consoleService.printViewTransferHistory3(transferById.getTransferId(), currentUser.getUser().getUsername(), transferById.getOtherUser(), transferById.getAmount());
                 break;
 
             } else if (requestedTransfer.getTransferId() == transferId && !requestedTransfer.isWasSentToUs()) {
                 Transfer transferById = accountService.historyByTransferId(currentUser.getToken(), currentUser.getUser().getId(), transferId);
-                System.out.println("\nID: " + transferById.getTransferId() + "\nFrom User: " + currentUser.getUser().getUsername() + "\nTo User: " + transferById.getOtherUser() +
-                        "\nTransfer Status: Approved" + "\nFor the Amount of: $" + transferById.getAmount());
+                consoleService.printViewTransferHistory3(transferById.getTransferId(), currentUser.getUser().getUsername(), transferById.getOtherUser(), transferById.getAmount());
                 break;
             }
         }
@@ -147,8 +142,38 @@ public class App {
     }
 
     private void sendBucks() {
-        // TODO Auto-generated method stub
+        consoleService.printSendBuk();
+        List<User> otherUsersList = new ArrayList<>(Arrays.asList(accountService.getOtherUsers(currentUser.getToken())));
 
+        for (User u : otherUsersList) {
+            System.out.println(u.getId() + "        " + u.getUsername());
+        }
+
+        NewTransfer newTransfer = new NewTransfer();
+        int accountTo = console.getUserInputInteger("Enter the ID you are sending to (0 to Cancel)");
+        boolean accountFound = false;
+        if (accountTo == 0) {
+            consoleService.printSendBuk2();
+        } else {
+            for (User u : otherUsersList) {
+                if (u.getId() == accountTo) {
+                    newTransfer.setToUserId(accountTo);
+                    accountFound = true;
+                }
+            }
+            if (!accountFound) {
+                consoleService.printSendBuk3();
+            } else {
+                BigDecimal amountToTransfer = BigDecimal.valueOf(Double.parseDouble(console.getUserInput("Enter amount of transfer")));
+                newTransfer.setAmount(amountToTransfer);
+                BigDecimal userBalance = accountService.getBalance(currentUser.getToken());
+                if (userBalance.compareTo(amountToTransfer) < 0) {
+                    consoleService.printSendBuk4();
+                } else {
+                    accountService.transferMoney(currentUser.getToken(), currentUser.getUser().getId(), newTransfer.getToUserId(), newTransfer.getAmount());
+                }
+            }
+        }
     }
 
     private void requestBucks() {

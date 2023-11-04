@@ -113,7 +113,38 @@ public class ConsoleService {
         } while(result == null);
         return result;
     }
+    public String printCurrentBalance() {
+        return "Your current account balance is: $";
+    }
+    public void printViewTransferHistory1() {
+        System.out.println("-------------------------------------------\n" + "TRANSFER HISTORY:\n" + "\n" +
+                "TRANSFER ID      FROM/TO        AMOUNT\n-------------------------------------------");
 
+    }
+    public void printViewTransferHistory2(int id, String user, BigDecimal amount) {
+        System.out.println(id + "          FROM: " + user +
+                "       $" + amount + "\n");
+    }
+    public void printViewTransferHistory3(int id, String user1, String user2, BigDecimal amount) {
+        System.out.println("\nID: " + id + "\nFrom User: " + user1 + "\nTo User: " + user2 +
+                "\nTransfer Status: Approved" + "\nFor the Amount of: $" + amount);
+    }
+    public void printSendBuk() {
+        System.out.println("-------------------------------------------\n" + "Users\n" + "ID    Name\n" + "-------------------------------------------\n");
+    }
+
+    public void printSendBuk2() {
+        System.out.println("Returning to Main Menu");
+    }
+
+    public void printSendBuk3() {
+        System.out.println("Not a valid User ID!");
+
+    }
+
+    public void printSendBuk4() {
+        System.out.println("NOT ENOUGH MONEY!");
+    }
     public String getUserInput(String prompt) {
         out.print(prompt+": ");
         out.flush();
